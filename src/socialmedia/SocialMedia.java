@@ -1,6 +1,6 @@
 package socialmedia;
-
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * WRITE STUFF HERE
@@ -10,16 +10,33 @@ import java.io.IOException;
  */
 public class SocialMedia implements SocialMediaPlatform {
 
-	@Override
-	public int createAccount(String handle) throws IllegalHandleException, InvalidHandleException {
-		// TODO Auto-generated method stub
-		return 0;
+
+	ArrayList<Account> accounts = new ArrayList();
+	ArrayList<Post> posts = new ArrayList();
+
+	public int idGenerator() {
+		int maxId = 0;
+		for (Account acc : accounts) {
+			if (maxId < acc.getId()) {
+				maxId=acc.getId();
+			}
+		}
+		return maxId++;
 	}
 
 	@Override
-	public int createAccount(String handle, String description) throws IllegalHandleException, InvalidHandleException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int createAccount(String handle) throws IllegalHandleException, InvalidHandleException {
+		int id;
+		id=idGenerator();
+		accounts.add(new Account(id, handle, ""));
+		return id;
+	}
+
+	@Override
+	public int createAccount(String handle, String description) throws IllegalHandleException, InvalidHandleException {		int id;
+		id=idGenerator();
+		accounts.add(new Account(id, handle, description));
+		return id;
 	}
 
 	@Override
