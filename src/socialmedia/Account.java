@@ -11,10 +11,11 @@ public class Account {
         this.description = description;
     }
 
-
     public int getId() {
         return id;
     }
 
-
+    public String getHandle() {
+        return handle;
+    }
 }
