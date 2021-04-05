@@ -15,4 +15,8 @@ public class GenericPost extends Post{
     public int getId() {
         return id;
     }
+
+    public ArrayList<CommentPost> getComments(){
+        return comments;
+    }
 }

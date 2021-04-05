@@ -16,4 +16,5 @@ public class EndorsementPost extends Post{
     public int getId() {
         return id;
     }
+
 }
