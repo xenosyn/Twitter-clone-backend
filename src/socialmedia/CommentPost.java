@@ -20,4 +20,16 @@ public class CommentPost extends Post {
     public int getId() {
         return id;
     }
+
+    public ArrayList<CommentPost> getComments() {
+        return comments;
+    }
+
+    public ArrayList<EndorsementPost> getEndorsements() {
+        return endorsements;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
 }

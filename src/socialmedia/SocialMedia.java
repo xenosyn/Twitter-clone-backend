@@ -69,13 +69,23 @@ public class SocialMedia implements SocialMediaPlatform {
 	public void changeAccountHandle(String oldHandle, String newHandle)
 			throws HandleNotRecognisedException, IllegalHandleException, InvalidHandleException {
 		// TODO Auto-generated method stub
+		// TODO - check no one has newHandle already
+		for(Account a:accounts){
+			if(oldHandle.equals(a.getHandle())){
+				a.setHandle(newHandle);
+			}
+		}
 
 	}
 
 	@Override
 	public void updateAccountDescription(String handle, String description) throws HandleNotRecognisedException {
 		// TODO Auto-generated method stub
-
+		for(Account a:accounts){
+			if(a.getHandle().equals(handle)){
+				a.setDescription(description);
+			}
+		}
 	}
 
 	@Override
@@ -142,19 +152,28 @@ public class SocialMedia implements SocialMediaPlatform {
 			OriginalPost originalPost = (OriginalPost) post;
 			ArrayList<EndorsementPost> endorsements
 					= originalPost.getEndorsements();
-			// TODO - NOW REMOVE ENDORSEMENTS AND COMMENTS
-		} else if (post instanceof CommentPost) {
-			// TODO - THIS IS COMMENT
-		} else {
-			// TODO - THIS IS AN ENDORSEMENT POST!!!!! (╯°□°）╯︵ ┻━┻
-			//  I've now calmed down, I think perhaps you can remove
-			//  endorsement posts, it just won't look for comments or
-			//  endorsements.
-		}
-		// TODO - delete post endorsements and redirect comments to genPost
+			ArrayList<CommentPost> comments = originalPost.getComments();
+			for ( CommentPost o: comments){
+				o.setPost(genPost);
+			}
+			ArrayList<CommentPost> genPostComments = genPost.getComments();
+			genPostComments.addAll(comments);
+			posts.removeAll(endorsements);
 
+		} else if (post instanceof CommentPost) {
+			CommentPost commentPost = (CommentPost) post;
+			ArrayList<EndorsementPost> endorsements = commentPost.getEndorsements();
+			ArrayList<CommentPost> comments = commentPost.getComments();
+			for (CommentPost c : comments) {
+				c.setPost(genPost);
+			}
+			ArrayList<CommentPost> genPostComments = genPost.getComments();
+			genPostComments.addAll(comments);
+			posts.removeAll(endorsements);
+		}
 		posts.remove(post);
 	}
+
 
 	@Override
 	public String showIndividualPost(int id) throws PostIDNotRecognisedException {

@@ -18,4 +18,12 @@ public class Account {
     public String getHandle() {
         return handle;
     }
+
+    public void setHandle(String handle) {
+        this.handle = handle;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
