@@ -17,8 +17,23 @@ public class CommentPost extends Post {
         this.post = post;
     }
 
-    public int getId() {
-        return id;
+    public ArrayList<CommentPost> getComments() {
+        return comments;
+    }
+
+    public ArrayList<EndorsementPost> getEndorsements() {
+        return endorsements;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + "\nAccount: " + author.getHandle()
+                + "\nNo. endorsements: " + endorsements.size()
+                + " | No. comments: " + comments.size() + "\n" + message;
     }
 
     public ArrayList<CommentPost> getComments() {

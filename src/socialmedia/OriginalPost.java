@@ -14,10 +14,6 @@ public class OriginalPost extends Post {
         this.message = message;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public String getMessage(){
         return message;
     }

@@ -13,8 +13,4 @@ public class EndorsementPost extends Post{
         this.post=post;
     }
 
-    public int getId() {
-        return id;
-    }
-
 }

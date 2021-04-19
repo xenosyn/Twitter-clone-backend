@@ -5,9 +5,15 @@ public abstract class Post {
     private Account author;
     private String message;
 
-    public abstract int getId();
+    public int getId() {
+        return id;
+    }
 
     public String getMessage() {
         return message;
+    }
+
+    public Account getAuthor() {
+        return author;
     }
 }
