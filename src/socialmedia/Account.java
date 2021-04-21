@@ -26,4 +26,11 @@ public class Account {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + "\n" +
+                "Handle: " + handle + '\n' +
+                "Description: " + description;
+}
 }

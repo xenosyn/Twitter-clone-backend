@@ -15,8 +15,4 @@ public class GenericPost extends Post{
     public ArrayList<CommentPost> getComments(){
         return comments;
     }
-
-    public ArrayList<CommentPost> getComments(){
-        return comments;
-    }
 }

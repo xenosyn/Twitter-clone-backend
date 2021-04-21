@@ -35,16 +35,4 @@ public class CommentPost extends Post {
                 + "\nNo. endorsements: " + endorsements.size()
                 + " | No. comments: " + comments.size() + "\n" + message;
     }
-
-    public ArrayList<CommentPost> getComments() {
-        return comments;
-    }
-
-    public ArrayList<EndorsementPost> getEndorsements() {
-        return endorsements;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
 }
