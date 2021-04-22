@@ -1,9 +1,15 @@
 package socialmedia;
 
 public abstract class Post {
-    private int id;
-    private Account author;
-    private String message;
+    int id;
+    Account author;
+    String message;
+
+    Post(int id, Account author, String message) {
+        this.id = id;
+        this.author = author;
+        this.message = message;
+    }
 
     public int getId() {
         return id;

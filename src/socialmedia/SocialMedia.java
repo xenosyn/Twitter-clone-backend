@@ -24,10 +24,16 @@ import java.util.regex.Pattern;
 public class SocialMedia implements SocialMediaPlatform {
 
 
-    ArrayList<Account> accounts = new ArrayList<>();
-    ArrayList<Post> posts = new ArrayList<>();
+    ArrayList<Account> accounts;
+    ArrayList<Post> posts;
     // Generic post for comments of deleted posts to be linked to
-    GenericPost genPost = new GenericPost();
+    GenericPost genPost;
+
+    public SocialMedia(){
+        accounts = new ArrayList<>();
+        posts = new ArrayList<>();
+        genPost = new GenericPost();
+    }
 
     /**
      * Generates an id which is 1 higher than the existing highest one.
@@ -141,31 +147,37 @@ public class SocialMedia implements SocialMediaPlatform {
 
     @Override
     public void updateAccountDescription(String handle, String description) throws HandleNotRecognisedException {
-        // TODO Auto-generated method stub
         checkHandleExists(handle);
         getAccountByHandle(handle).setDescription(description);
     }
 
     @Override
     public String showAccount(String handle) throws HandleNotRecognisedException {
-        // TODO Auto-generated method stub
         checkHandleExists(handle);
         Account showAcc = getAccountByHandle(handle);
-        // TODO - Find post count
 
-        // TODO - Find endorsement count
+        // Find post count and endorsement count
+        int postCount = 0;
+        int endorseCount = 0;
+        for (Post pst : posts) {
+            if (pst.getAuthor().equals(showAcc)) {
+                postCount++;
+                if (pst instanceof OriginalPost) {
+                    OriginalPost op = (OriginalPost) pst;
+                    endorseCount += op.getEndorsements().size();
+                } else if (pst instanceof CommentPost) {
+                    CommentPost cp = (CommentPost) pst;
+                    endorseCount += cp.getEndorsements().size();
+                }
+            }
+        }
 
-        // TODO - Make strAppend
-        String strAppend = "\nPost count: " ;
+        // Make strAppend
+        String strAppend = "\nPost count: " + postCount + "\nEndorse count: "
+                + endorseCount;
 
-        // TODO - append strAppend
-        return getAccountByHandle(handle).toString();
-
-        // ID: [account ID]
-        // Handle: [account handle]
-        // Description: [account description]
-        // Post count: [total number of posts, including endorsements and replies]
-        // Endorse count: [sum of endorsements received by each post of this account]
+        // Append strAppend
+        return getAccountByHandle(handle).toString() + strAppend;
     }
 
     public Account getAccountByHandle(String handle) {
@@ -192,11 +204,19 @@ public class SocialMedia implements SocialMediaPlatform {
         return account;
     }
 
+    public void checkPostIsValid(String message) throws InvalidPostException {
+        if (message.length() < 1 || message.length() > 100) {
+            throw new InvalidPostException("Post message must be between 1 and"
+                    + " 100 characters!");
+        }
+    }
+
     @Override
     public int createPost(String handle, String message) throws HandleNotRecognisedException, InvalidPostException {
+        checkHandleExists(handle);
+        checkPostIsValid(message);
         int id;
         id = idGenerator("p");
-        checkHandleExists(handle);
         posts.add(new OriginalPost(id, getAccountByHandle(handle), message));
         return id;
     }
@@ -225,21 +245,45 @@ public class SocialMedia implements SocialMediaPlatform {
     @Override
     public int endorsePost(String handle, int id)
             throws HandleNotRecognisedException, PostIDNotRecognisedException, NotActionablePostException {
-        int endoId;
-        Post post;
-        endoId = idGenerator("p");
-        post = postFinder(id);
+        checkHandleExists(handle);
+
+        Post post = postFinder(id);
+        checkPostExists(post);
+        checkPostIsActionable(post);
+
+        int endoId = idGenerator("p");
         String message = "EP@" + handle + ": " + post.getMessage();
         posts.add(new EndorsementPost(endoId, getAccountByHandle(handle),
                 message , post));
         return endoId;
     }
 
+    public void checkPostIsActionable(Post post)
+            throws NotActionablePostException {
+        if (post instanceof EndorsementPost) {
+            throw new NotActionablePostException("Endorsement posts cannot be"
+                    + " endorsed or commented on.");
+        }
+    }
+
+    public void checkPostExists(Post post) throws PostIDNotRecognisedException {
+        if (post == null) {
+            throw new PostIDNotRecognisedException("No post exists with"
+                    + " specified ID.");
+        }
+    }
+
     @Override
     public int commentPost(String handle, int id, String message) throws HandleNotRecognisedException,
             PostIDNotRecognisedException, NotActionablePostException, InvalidPostException {
-        int commId = idGenerator("p");
+        checkHandleExists(handle);
+
         Post post = postFinder(id);
+        checkPostExists(post);
+        checkPostIsActionable(post);
+        checkPostIsValid(message);
+
+        int commId = idGenerator("p");
         posts.add(new CommentPost(commId, getAccountByHandle(handle), message,
                 post));
         return commId;
@@ -248,6 +292,7 @@ public class SocialMedia implements SocialMediaPlatform {
     @Override
     public void deletePost(int id) throws PostIDNotRecognisedException {
         Post post = postFinder(id);
+        checkPostExists(post);
         if (post instanceof OriginalPost) {
             OriginalPost originalPost = (OriginalPost) post;
             ArrayList<EndorsementPost> endorsements
@@ -277,21 +322,17 @@ public class SocialMedia implements SocialMediaPlatform {
 
     @Override
     public String showIndividualPost(int id) throws PostIDNotRecognisedException {
-        // TODO - exception
         Post post = postFinder(id);
+        checkPostExists(post);
         return post.toString();
     }
 
     @Override
     public StringBuilder showPostChildrenDetails(int id)
             throws PostIDNotRecognisedException, NotActionablePostException {
-        // TODO - exceptions
         Post post = postFinder(id);
-
-        // Check if post is endorsement
-        if (post instanceof EndorsementPost) {
-            throw new NotActionablePostException(); // TODO - add text
-        }
+        checkPostExists(post);
+        checkPostIsActionable(post);
 
         StringBuilder init = new StringBuilder();
         appendChildrenRecursively(post,init,0);
@@ -405,7 +446,6 @@ public class SocialMedia implements SocialMediaPlatform {
 
     @Override
     public void savePlatform(String filename) throws IOException {
-        // TODO - check filename and file
         File file = new File(filename);
 
         try (ObjectOutputStream out
@@ -422,8 +462,11 @@ public class SocialMedia implements SocialMediaPlatform {
 
     @Override
     public void loadPlatform(String filename) throws IOException, ClassNotFoundException {
-        // TODO - check filename and file
         File file = new File(filename);
+        if (!file.exists()) {
+            throw new IOException("No file exists with the given pathname!");
+        }
+
         ArrayList<Post> posts;
         ArrayList<Account> accounts;
         GenericPost genPost;

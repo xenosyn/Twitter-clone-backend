@@ -3,18 +3,15 @@ package socialmedia;
 import java.util.ArrayList;
 
 public class CommentPost extends Post {
-    private int id;
-    private Account author;
-    private String message;
     private Post post;
     private ArrayList<EndorsementPost> endorsements;
     private ArrayList<CommentPost> comments;
 
     public CommentPost(int id, Account author, String message, Post post) {
-        this.id = id;
-        this.author = author;
-        this.message = message;
+        super(id, author, message);
         this.post = post;
+        endorsements = new ArrayList<EndorsementPost>();
+        comments = new ArrayList<CommentPost>();
     }
 
     public ArrayList<CommentPost> getComments() {
@@ -27,6 +24,10 @@ public class CommentPost extends Post {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public Post getPost() {
+        return post;
     }
 
     @Override

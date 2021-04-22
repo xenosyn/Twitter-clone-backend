@@ -1,8 +1,4 @@
-import socialmedia.AccountIDNotRecognisedException;
-import socialmedia.SocialMedia;
-import socialmedia.IllegalHandleException;
-import socialmedia.InvalidHandleException;
-import socialmedia.SocialMediaPlatform;
+import socialmedia.*;
 
 /**
  * A short program to illustrate an app testing some minimal functionality of a
@@ -25,7 +21,10 @@ public class SocialMediaPlatformTestApp {
 		System.out.println("The system compiled and started the execution...");
 
 		SocialMediaPlatform platform = new SocialMedia();
+		initialise(platform);
+	}
 
+	public static void initialise(SocialMediaPlatform platform) {
 		assert (platform.getNumberOfAccounts() == 0) : "Innitial SocialMediaPlatform not empty as required.";
 		assert (platform.getTotalOriginalPosts() == 0) : "Innitial SocialMediaPlatform not empty as required.";
 		assert (platform.getTotalCommentPosts() == 0) : "Innitial SocialMediaPlatform not empty as required.";
@@ -47,6 +46,34 @@ public class SocialMediaPlatformTestApp {
 			assert (false) : "AccountIDNotRecognizedException thrown incorrectly";
 		}
 
+		Integer postID;
+		Integer accountId;
+		Integer endoID;
+		try {
+			accountId = platform.createAccount("neel");
+			postID =  platform.createPost("neel","haha!");
+			assert (platform.getTotalCommentPosts() == 1) : " number of posts registered in the system does not match";
+			platform.changeAccountHandle("neel","neil");
+			// if throws HandleNotRecognisedException then update to handle not registered correctly
+			platform.showAccount("neil");
+			endoID= platform.endorsePost("niel",postID);
+		} catch (IllegalHandleException e) {
+			assert (false) : "IllegalHandleException thrown incorrectly";
+		} catch (InvalidHandleException e) {
+			assert (false) : "InvalidHandleException thrown incorrectly";
+		}  catch (HandleNotRecognisedException e) {
+			assert (false) : "HandleNotRecognisedException thrown incorrectly";
+		} catch (InvalidPostException e) {
+			assert (false) : "InvalidPostException thrown incorrectly";
+		} catch (NotActionablePostException e) {
+			assert (false) : "NotActionablePostException  thrown incorrectly";
+		} catch (PostIDNotRecognisedException e) {
+			assert (false) : "PostIDNotRecognisedException thrown incorrectly";
+		}
+
+	}
 	}
 
-}
+
+
+
