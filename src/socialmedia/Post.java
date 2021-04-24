@@ -1,6 +1,8 @@
 package socialmedia;
+import java.io.Serializable;
 
-public abstract class Post {
+public abstract class Post implements Serializable {
+    // TODO - make private and use getters and setters
     int id;
     Account author;
     String message;

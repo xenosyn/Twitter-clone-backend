@@ -23,6 +23,22 @@ public class OriginalPost extends Post {
         return endorsements;
     }
 
+    public void addComment(CommentPost commentPost) {
+        comments.add(commentPost);
+    }
+
+    public void removeComment(CommentPost commentPost) {
+        comments.remove(commentPost);
+    }
+
+    public void addEndorsement(EndorsementPost endorsementPost) {
+        endorsements.add(endorsementPost);
+    }
+
+    public void removeEndorsement(EndorsementPost endorsementPost) {
+        endorsements.remove(endorsementPost);
+    }
+
     @Override
     public String toString() {
         return "ID: " + id + "\nAccount: " + author.getHandle()

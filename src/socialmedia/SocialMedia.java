@@ -58,7 +58,7 @@ public class SocialMedia implements SocialMediaPlatform {
                 }
                 break;
         }
-        return maxId++;
+        return ++maxId;
     }
 
     @Override
@@ -238,7 +238,7 @@ public class SocialMedia implements SocialMediaPlatform {
                 c++;
             }
         }
-        return c++;
+        return c;
     }
 
 
@@ -251,21 +251,51 @@ public class SocialMedia implements SocialMediaPlatform {
         checkPostExists(post);
         checkPostIsActionable(post);
 
+
+
         int endoId = idGenerator("p");
         String message = "EP@" + handle + ": " + post.getMessage();
-        posts.add(new EndorsementPost(endoId, getAccountByHandle(handle),
-                message , post));
+        Account account = getAccountByHandle(handle);
+        EndorsementPost newEndorsement = new EndorsementPost(endoId,
+                account, message , post);
+
+        if (post instanceof OriginalPost) {
+            OriginalPost op = (OriginalPost) post;
+            for (EndorsementPost ep: op.getEndorsements()) {
+                if(ep.getAuthor().equals(account)) {
+                    return ep.getId();
+                }
+            }
+            op.addEndorsement(newEndorsement);
+        } else if (post instanceof CommentPost) {
+            CommentPost cp = (CommentPost) post;
+            for (EndorsementPost ep: cp.getEndorsements()) {
+                if (ep.getAuthor().equals(account)) {
+                    return ep.getId();
+                }
+            }
+            cp.addEndorsement(newEndorsement);
+        }
+
+        posts.add(newEndorsement);
+
         return endoId;
     }
 
     public void checkPostIsActionable(Post post)
             throws NotActionablePostException {
         if (post instanceof EndorsementPost) {
+            System.out.println(post.getClass());
             throw new NotActionablePostException("Endorsement posts cannot be"
                     + " endorsed or commented on.");
         }
     }
 
+    /**
+     * The method checks if the post passed as input contains info and is not null.
+     * @param post - passes post Object.
+     * @throws PostIDNotRecognisedException - checks if post is null , if true throws exception
+     */
     public void checkPostExists(Post post) throws PostIDNotRecognisedException {
         if (post == null) {
             throw new PostIDNotRecognisedException("No post exists with"
@@ -273,22 +303,49 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
+    /**
+     * The method generates a comment with the given handle and message to a post by the id that is passed as input
+     * @param handle  of the account commenting a post.
+     * @param id      of the post being commented.
+     * @param message the comment post message.
+     * @return the ID of the comment created.
+     * @throws HandleNotRecognisedException  checks the handle passed has an account id , throws exception if false
+     * @throws PostIDNotRecognisedException   checks if post is null , if true throws exception
+     * @throws NotActionablePostException  checks if post is a comment or original post to be able to comment
+     * @throws InvalidPostException  checks if post contains a message or if message is too big
+     */
     @Override
     public int commentPost(String handle, int id, String message) throws HandleNotRecognisedException,
             PostIDNotRecognisedException, NotActionablePostException, InvalidPostException {
         checkHandleExists(handle);
 
         Post post = postFinder(id);
+
         checkPostExists(post);
         checkPostIsActionable(post);
         checkPostIsValid(message);
 
         int commId = idGenerator("p");
-        posts.add(new CommentPost(commId, getAccountByHandle(handle), message,
-                post));
+        CommentPost newComment = new CommentPost(commId,
+                getAccountByHandle(handle), message, post);
+
+        posts.add(newComment);
+
+        if (post instanceof OriginalPost) {
+            OriginalPost op = (OriginalPost) post;
+            op.addComment(newComment);
+        } else if (post instanceof CommentPost) {
+            CommentPost cp = (CommentPost) post;
+            cp.addComment(newComment);
+        }
         return commId;
     }
 
+    /**
+     *This method removes the post from
+     * @param id ID of post to be removed.
+     * @throws PostIDNotRecognisedException  checks if post is null , if true throws exception
+     */
     @Override
     public void deletePost(int id) throws PostIDNotRecognisedException {
         Post post = postFinder(id);
@@ -315,11 +372,51 @@ public class SocialMedia implements SocialMediaPlatform {
             ArrayList<CommentPost> genPostComments = genPost.getComments();
             genPostComments.addAll(comments);
             posts.removeAll(endorsements);
+
+            removeCommentFromParent(commentPost);
+        } else if (post instanceof EndorsementPost) {
+            EndorsementPost endorsementPost = (EndorsementPost) post;
+            removeEndorsementFromParent(endorsementPost);
         }
         posts.remove(post);
     }
 
+    /**
+     *
+     * @param commentPost
+     */
+    public void removeCommentFromParent(CommentPost commentPost) {
+        Post parent = commentPost.getPost();
+        if (parent instanceof OriginalPost) {
+            OriginalPost op = (OriginalPost) parent;
+            op.removeComment(commentPost);
+        } else if (parent instanceof CommentPost) {
+            CommentPost cp = (CommentPost) parent;
+            cp.removeComment(commentPost);
+        }
+    }
 
+    /**
+     *
+     * @param endorsementPost
+     */
+    public void removeEndorsementFromParent(EndorsementPost endorsementPost) {
+        Post parent = endorsementPost.getPost();
+        if (parent instanceof OriginalPost) {
+            OriginalPost op = (OriginalPost) parent;
+            op.removeEndorsement(endorsementPost);
+        } else if (parent instanceof CommentPost) {
+            CommentPost cp = (CommentPost) parent;
+            cp.removeEndorsement(endorsementPost);
+        }
+    }
+
+    /**
+     *
+     * @param id of the post to be shown.
+     * @return
+     * @throws PostIDNotRecognisedException
+     */
     @Override
     public String showIndividualPost(int id) throws PostIDNotRecognisedException {
         Post post = postFinder(id);
@@ -327,6 +424,13 @@ public class SocialMedia implements SocialMediaPlatform {
         return post.toString();
     }
 
+    /**
+     *
+     * @param id of the post to be shown.
+     * @return
+     * @throws PostIDNotRecognisedException
+     * @throws NotActionablePostException
+     */
     @Override
     public StringBuilder showPostChildrenDetails(int id)
             throws PostIDNotRecognisedException, NotActionablePostException {
@@ -339,6 +443,12 @@ public class SocialMedia implements SocialMediaPlatform {
         return init;
     }
 
+    /**
+     *
+     * @param post
+     * @param sb
+     * @param depth
+     */
     public void appendChildrenRecursively(Post post, StringBuilder sb, int depth) {
         if (post instanceof OriginalPost) {
             OriginalPost originalPost = (OriginalPost) post;
@@ -373,26 +483,46 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getNumberOfAccounts() {
         return accounts.size();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getTotalOriginalPosts() {
         return postCount(OriginalPost.class);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getTotalEndorsmentPosts() {
         return postCount(EndorsementPost.class);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getTotalCommentPosts() {
         return postCount(CommentPost.class);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getMostEndorsedPost() {
         int id = -1;
@@ -415,6 +545,10 @@ public class SocialMedia implements SocialMediaPlatform {
         return id;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int getMostEndorsedAccount() {
         LinkedHashMap<Account, Integer> endorsedAccounts
@@ -437,6 +571,9 @@ public class SocialMedia implements SocialMediaPlatform {
         return id;
     }
 
+    /**
+     *
+     */
     @Override
     public void erasePlatform() {
         accounts.clear();
@@ -444,6 +581,12 @@ public class SocialMedia implements SocialMediaPlatform {
         genPost.getComments().clear();
     }
 
+
+    /**
+     *
+     * @param filename location of the file to be saved
+     * @throws IOException
+     */
     @Override
     public void savePlatform(String filename) throws IOException {
         File file = new File(filename);
@@ -460,6 +603,12 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
+    /**
+     *
+     * @param filename location of the file to be loaded
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     @Override
     public void loadPlatform(String filename) throws IOException, ClassNotFoundException {
         File file = new File(filename);

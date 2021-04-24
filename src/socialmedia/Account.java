@@ -1,6 +1,7 @@
 package socialmedia;
+import java.io.Serializable;
 
-public class Account {
+public class Account implements Serializable{
     private int id;
     private String handle;
     private String description;
