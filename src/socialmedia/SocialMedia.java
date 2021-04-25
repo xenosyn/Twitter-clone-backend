@@ -303,17 +303,7 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
-    /**
-     * The method generates a comment with the given handle and message to a post by the id that is passed as input
-     * @param handle  of the account commenting a post.
-     * @param id      of the post being commented.
-     * @param message the comment post message.
-     * @return the ID of the comment created.
-     * @throws HandleNotRecognisedException  checks the handle passed has an account id , throws exception if false
-     * @throws PostIDNotRecognisedException   checks if post is null , if true throws exception
-     * @throws NotActionablePostException  checks if post is a comment or original post to be able to comment
-     * @throws InvalidPostException  checks if post contains a message or if message is too big
-     */
+
     @Override
     public int commentPost(String handle, int id, String message) throws HandleNotRecognisedException,
             PostIDNotRecognisedException, NotActionablePostException, InvalidPostException {
@@ -341,11 +331,6 @@ public class SocialMedia implements SocialMediaPlatform {
         return commId;
     }
 
-    /**
-     *This method removes the post from
-     * @param id ID of post to be removed.
-     * @throws PostIDNotRecognisedException  checks if post is null , if true throws exception
-     */
     @Override
     public void deletePost(int id) throws PostIDNotRecognisedException {
         Post post = postFinder(id);
@@ -382,8 +367,9 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     /**
-     *
-     * @param commentPost
+     * This method uses the input of comment post and gets the original post
+     * or comment to remove the comment from the orginal post/comment array
+     * @param commentPost comment post object data
      */
     public void removeCommentFromParent(CommentPost commentPost) {
         Post parent = commentPost.getPost();
@@ -397,8 +383,9 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     /**
-     *
-     * @param endorsementPost
+     * This method uses the input of endorsement post and gets the original post
+     * or comment to remove the comment from the orginal post/comment array
+     * @param endorsementPost endorsement post object data
      */
     public void removeEndorsementFromParent(EndorsementPost endorsementPost) {
         Post parent = endorsementPost.getPost();
@@ -411,12 +398,6 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
-    /**
-     *
-     * @param id of the post to be shown.
-     * @return
-     * @throws PostIDNotRecognisedException
-     */
     @Override
     public String showIndividualPost(int id) throws PostIDNotRecognisedException {
         Post post = postFinder(id);
@@ -424,13 +405,6 @@ public class SocialMedia implements SocialMediaPlatform {
         return post.toString();
     }
 
-    /**
-     *
-     * @param id of the post to be shown.
-     * @return
-     * @throws PostIDNotRecognisedException
-     * @throws NotActionablePostException
-     */
     @Override
     public StringBuilder showPostChildrenDetails(int id)
             throws PostIDNotRecognisedException, NotActionablePostException {
@@ -444,10 +418,13 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     /**
-     *
-     * @param post
-     * @param sb
-     * @param depth
+     *This method generates a string of a thread of comments on a post or comment
+     * with distinct spacing by taking the comment/original post as in put
+     * and going through each posts comments array appending it to string.
+     * @param post passes post object
+     * @param sb used to build the string recursively
+     * @param depth used to calculate spacing and format comment on post
+     *              and comments on comments recursively
      */
     public void appendChildrenRecursively(Post post, StringBuilder sb, int depth) {
         if (post instanceof OriginalPost) {
@@ -483,46 +460,28 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getNumberOfAccounts() {
         return accounts.size();
     }
 
-    /**
-     *
-     * @return
-     */
+
     @Override
     public int getTotalOriginalPosts() {
         return postCount(OriginalPost.class);
     }
 
-    /**
-     *
-     * @return
-     */
+
     @Override
     public int getTotalEndorsmentPosts() {
         return postCount(EndorsementPost.class);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getTotalCommentPosts() {
         return postCount(CommentPost.class);
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getMostEndorsedPost() {
         int id = -1;
@@ -545,10 +504,6 @@ public class SocialMedia implements SocialMediaPlatform {
         return id;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public int getMostEndorsedAccount() {
         LinkedHashMap<Account, Integer> endorsedAccounts
@@ -571,9 +526,6 @@ public class SocialMedia implements SocialMediaPlatform {
         return id;
     }
 
-    /**
-     *
-     */
     @Override
     public void erasePlatform() {
         accounts.clear();
@@ -581,12 +533,6 @@ public class SocialMedia implements SocialMediaPlatform {
         genPost.getComments().clear();
     }
 
-
-    /**
-     *
-     * @param filename location of the file to be saved
-     * @throws IOException
-     */
     @Override
     public void savePlatform(String filename) throws IOException {
         File file = new File(filename);
@@ -603,12 +549,6 @@ public class SocialMedia implements SocialMediaPlatform {
         }
     }
 
-    /**
-     *
-     * @param filename location of the file to be loaded
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
     @Override
     public void loadPlatform(String filename) throws IOException, ClassNotFoundException {
         File file = new File(filename);

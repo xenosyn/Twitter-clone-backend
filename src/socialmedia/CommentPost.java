@@ -87,10 +87,6 @@ public class CommentPost extends Post {
         return post;
     }
 
-    /**
-     *
-     * @return the comment as a string to be outputted.
-     */
     @Override
     public String toString() {
         return "ID: " + id + "\nAccount: " + author.getHandle()
