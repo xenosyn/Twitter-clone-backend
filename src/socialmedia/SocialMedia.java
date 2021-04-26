@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Main class for this social media platform that implements most of the
+ * Main class for this social media app that implements most of the
  * SocialMediaPlatform interface's methods.
  *
  * @author Hayden
@@ -23,13 +23,17 @@ import java.util.regex.Pattern;
  */
 public class SocialMedia implements SocialMediaPlatform {
 
-
     ArrayList<Account> accounts;
     ArrayList<Post> posts;
     // Generic post for comments of deleted posts to be linked to
     GenericPost genPost;
 
-    public SocialMedia(){
+    /**
+     * Instantiates a social media platform object that stores accounts, posts
+     * and a generic post which holds all comments that originally pointed to
+     * posts that have since been deleted.
+     */
+    public SocialMedia() {
         accounts = new ArrayList<>();
         posts = new ArrayList<>();
         genPost = new GenericPost();
@@ -62,7 +66,8 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     @Override
-    public int createAccount(String handle) throws IllegalHandleException, InvalidHandleException {
+    public int createAccount(String handle)
+            throws IllegalHandleException,InvalidHandleException {
         checkInvalidHandle(handle);
         checkIllegalHandle(handle);
         int id;
@@ -72,7 +77,8 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     @Override
-    public int createAccount(String handle, String description) throws IllegalHandleException, InvalidHandleException {
+    public int createAccount(String handle, String description)
+            throws IllegalHandleException, InvalidHandleException {
         checkInvalidHandle(handle);
         checkIllegalHandle(handle);
         int id;
@@ -94,6 +100,10 @@ public class SocialMedia implements SocialMediaPlatform {
         removeAccount(getAccountByHandle(handle));
     }
 
+    /**
+     * Removes an account from the system along with any of it's posts.
+     * @param account account to remove
+     */
     public void removeAccount(Account account) {
         for (Post post : posts) {
             if (post.getAuthor().equals(account)) {
@@ -107,26 +117,57 @@ public class SocialMedia implements SocialMediaPlatform {
         accounts.remove(account);
     }
 
-    public void checkAccountIdExists(int id) throws AccountIDNotRecognisedException {
+    /**
+     * Checks if an account exists with the passed id and throws an exception
+     * if not.
+     * @param id id to be searched for in the system
+     * @throws AccountIDNotRecognisedException thrown if no account could be
+     *                                         found with the passed id
+     */
+    public void checkAccountIdExists(int id)
+            throws AccountIDNotRecognisedException {
         if(getAccountById(id) == null){
             throw new AccountIDNotRecognisedException("No account exists with"
                     + " specified id.");
         }
     }
 
-    public void checkHandleExists(String handle) throws HandleNotRecognisedException {
+    /**
+     * Checks if an account exists with the passed handle and throws an
+     * exception if not.
+     * @param handle handle to be searched for in the system
+     * @throws HandleNotRecognisedException thrown if no account could be found
+     *                                      found with the passed handle
+     */
+    public void checkHandleExists(String handle)
+            throws HandleNotRecognisedException {
         if(getAccountByHandle(handle)==null){
             throw new HandleNotRecognisedException("No account exists with"
                     + " specified handle.");
         }
     }
 
+    /**
+     * Checks if the passed handle already belongs to an account in the system
+     * and throws an exception if it does.
+     * @param handle handle to be searched for in the system
+     * @throws IllegalHandleException thrown if an account already has the
+     *                                passed handle
+     */
     public void checkIllegalHandle(String handle) throws IllegalHandleException{
         if(getAccountByHandle(handle) != null){
             throw new IllegalHandleException("Handle already exists!");
         }
     }
 
+    /**
+     * Checks if the passed handle conforms to the following rules for handles
+     * in this social media system: must not be empty or have more than 30
+     * characters and must not have white spaces.
+     * @param handle handle to be checked
+     * @throws InvalidHandleException thrown if the handle does not conform to
+     *                                the specified rules
+     */
     public void checkInvalidHandle(String handle) throws InvalidHandleException{
         if(handle.length()>30 || handle.length()<1 || handle.contains(" ")){
             throw new InvalidHandleException("Invalid handle! Handle must"
@@ -137,7 +178,8 @@ public class SocialMedia implements SocialMediaPlatform {
 
     @Override
     public void changeAccountHandle(String oldHandle, String newHandle)
-            throws HandleNotRecognisedException, IllegalHandleException, InvalidHandleException {
+            throws HandleNotRecognisedException,
+            IllegalHandleException, InvalidHandleException {
         checkHandleExists(oldHandle);
         checkInvalidHandle(newHandle);
         checkIllegalHandle(newHandle);
@@ -146,13 +188,15 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     @Override
-    public void updateAccountDescription(String handle, String description) throws HandleNotRecognisedException {
+    public void updateAccountDescription(String handle, String description)
+            throws HandleNotRecognisedException {
         checkHandleExists(handle);
         getAccountByHandle(handle).setDescription(description);
     }
 
     @Override
-    public String showAccount(String handle) throws HandleNotRecognisedException {
+    public String showAccount(String handle)
+            throws HandleNotRecognisedException {
         checkHandleExists(handle);
         Account showAcc = getAccountByHandle(handle);
 
@@ -180,6 +224,12 @@ public class SocialMedia implements SocialMediaPlatform {
         return getAccountByHandle(handle).toString() + strAppend;
     }
 
+    /**
+     * Returns the account object that matches the specified handle or null if
+     * none match it.
+     * @param handle handle of account to be found
+     * @return found account object or null if none exist with the passed handle
+     */
     public Account getAccountByHandle(String handle) {
         Account account = null;
         for (Account acc : accounts) {
@@ -192,6 +242,12 @@ public class SocialMedia implements SocialMediaPlatform {
         return account;
     }
 
+    /**
+     * Returns the account object that matches the specified id or null if none
+     * match it.
+     * @param id id of account to be found
+     * @return found account object or null if none exist with the passed id
+     */
     public Account getAccountById(int id) {
         Account account = null;
         for (Account acc : accounts) {
@@ -204,6 +260,14 @@ public class SocialMedia implements SocialMediaPlatform {
         return account;
     }
 
+    /**
+     * Checks if the passed post message conforms to the following rules for
+     * posts in this social media system: must not be empty or contain more than
+     * 100 characters.
+     * @param message post message to be checked
+     * @throws InvalidPostException thrown if the post message does not conform
+     *                              to the specified rules
+     */
     public void checkPostIsValid(String message) throws InvalidPostException {
         if (message.length() < 1 || message.length() > 100) {
             throw new InvalidPostException("Post message must be between 1 and"
@@ -212,7 +276,8 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     @Override
-    public int createPost(String handle, String message) throws HandleNotRecognisedException, InvalidPostException {
+    public int createPost(String handle, String message)
+            throws HandleNotRecognisedException, InvalidPostException {
         checkHandleExists(handle);
         checkPostIsValid(message);
         int id;
@@ -221,6 +286,12 @@ public class SocialMedia implements SocialMediaPlatform {
         return id;
     }
 
+    /**
+     * Returns the post object associated with the passed id or null if none
+     * match it.
+     * @param id id of post to be found
+     * @return found post object or null if none exist with the passed id
+     */
     public Post postFinder(int id){
         Post post = null;
         for (Post pst:posts ){
@@ -231,6 +302,12 @@ public class SocialMedia implements SocialMediaPlatform {
         return post;
     }
 
+    /**
+     * Counts how many posts there are which are instances of the passed post
+     * class in the system.
+     * @param input post class to be counted
+     * @return amount of posts of the specified class in the system
+     */
     public int postCount(Class<?> input) {
         int c = 0;
         for (Post pst : posts) {
@@ -244,7 +321,8 @@ public class SocialMedia implements SocialMediaPlatform {
 
     @Override
     public int endorsePost(String handle, int id)
-            throws HandleNotRecognisedException, PostIDNotRecognisedException, NotActionablePostException {
+            throws HandleNotRecognisedException,
+            PostIDNotRecognisedException, NotActionablePostException {
         checkHandleExists(handle);
 
         Post post = postFinder(id);
@@ -282,19 +360,27 @@ public class SocialMedia implements SocialMediaPlatform {
         return endoId;
     }
 
+    /**
+     * Checks if the post object passes as input is able to be endorsed and
+     * commented on. This is not true if it is an endorsement post.
+     * @param post post object
+     * @throws NotActionablePostException thrown if the passed post object is an
+     *                                    endorsement post
+     */
     public void checkPostIsActionable(Post post)
             throws NotActionablePostException {
         if (post instanceof EndorsementPost) {
-            System.out.println(post.getClass());
             throw new NotActionablePostException("Endorsement posts cannot be"
                     + " endorsed or commented on.");
         }
     }
 
     /**
-     * The method checks if the post passed as input contains info and is not null.
+     * The method checks if the post object passed as input contains info and is
+     * not null.
      * @param post - passes post Object.
-     * @throws PostIDNotRecognisedException - checks if post is null , if true throws exception
+     * @throws PostIDNotRecognisedException - checks if post is null, if true
+     *                                        throws exception
      */
     public void checkPostExists(Post post) throws PostIDNotRecognisedException {
         if (post == null) {
@@ -305,8 +391,10 @@ public class SocialMedia implements SocialMediaPlatform {
 
 
     @Override
-    public int commentPost(String handle, int id, String message) throws HandleNotRecognisedException,
-            PostIDNotRecognisedException, NotActionablePostException, InvalidPostException {
+    public int commentPost(String handle, int id, String message)
+            throws HandleNotRecognisedException,
+            PostIDNotRecognisedException,
+            NotActionablePostException, InvalidPostException {
         checkHandleExists(handle);
 
         Post post = postFinder(id);
@@ -349,7 +437,8 @@ public class SocialMedia implements SocialMediaPlatform {
 
         } else if (post instanceof CommentPost) {
             CommentPost commentPost = (CommentPost) post;
-            ArrayList<EndorsementPost> endorsements = commentPost.getEndorsements();
+            ArrayList<EndorsementPost> endorsements
+                    = commentPost.getEndorsements();
             ArrayList<CommentPost> comments = commentPost.getComments();
             for (CommentPost c : comments) {
                 c.setPost(genPost);
@@ -367,9 +456,9 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     /**
-     * This method uses the input of comment post and gets the original post
-     * or comment to remove the comment from the orginal post/comment array
-     * @param commentPost comment post object data
+     * This method uses the input of comment post and removes it from it's
+     * parent post's comment ArrayList.
+     * @param commentPost comment post object
      */
     public void removeCommentFromParent(CommentPost commentPost) {
         Post parent = commentPost.getPost();
@@ -383,9 +472,9 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     /**
-     * This method uses the input of endorsement post and gets the original post
-     * or comment to remove the comment from the orginal post/comment array
-     * @param endorsementPost endorsement post object data
+     * This method uses the input of endorsement post and removes it from it's
+     * parent post's endorsement ArrayList.
+     * @param endorsementPost endorsement post object
      */
     public void removeEndorsementFromParent(EndorsementPost endorsementPost) {
         Post parent = endorsementPost.getPost();
@@ -399,7 +488,8 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     @Override
-    public String showIndividualPost(int id) throws PostIDNotRecognisedException {
+    public String showIndividualPost(int id)
+            throws PostIDNotRecognisedException {
         Post post = postFinder(id);
         checkPostExists(post);
         return post.toString();
@@ -418,15 +508,17 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     /**
-     *This method generates a string of a thread of comments on a post or comment
-     * with distinct spacing by taking the comment/original post as in put
-     * and going through each posts comments array appending it to string.
+     * This method recursively generates a StringBuilder containing a thread of
+     * comments on a post or comment with distinct indentation for each level by
+     * taking the comment/original post as input and going through the comments
+     * array, appending each comment and it's children to the StringBuilder.
      * @param post passes post object
-     * @param sb used to build the string recursively
-     * @param depth used to calculate spacing and format comment on post
+     * @param sb StringBuilder that the thread is built within
+     * @param depth used to calculate spacing and format comments on posts
      *              and comments on comments recursively
      */
-    public void appendChildrenRecursively(Post post, StringBuilder sb, int depth) {
+    public void appendChildrenRecursively(Post post, StringBuilder sb,
+                                          int depth) {
         if (post instanceof OriginalPost) {
             OriginalPost originalPost = (OriginalPost) post;
             ArrayList<CommentPost> comments = originalPost.getComments();
@@ -550,7 +642,8 @@ public class SocialMedia implements SocialMediaPlatform {
     }
 
     @Override
-    public void loadPlatform(String filename) throws IOException, ClassNotFoundException {
+    public void loadPlatform(String filename)
+            throws IOException, ClassNotFoundException {
         File file = new File(filename);
         if (!file.exists()) {
             throw new IOException("No file exists with the given pathname!");

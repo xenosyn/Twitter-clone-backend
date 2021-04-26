@@ -2,15 +2,22 @@ package socialmedia;
 
 import java.util.ArrayList;
 
+/**
+ * The class that represents comments in this social media app.
+ *
+ * @author Hayden
+ * @author Jorel
+ * @version 1.0
+ */
 public class CommentPost extends Post {
     private Post post;
     private ArrayList<EndorsementPost> endorsements;
     private ArrayList<CommentPost> comments;
 
     /**
-     *This method is used to generate comment post and
-     *store comments and endorsements of said the post
-     * it also acts as a pointer as the orginal post or comment as an input.
+     * This method is used to generate a comment post and create empty lists
+     * for endorsements and comments which are directed at it. Also sets post
+     * which stores a reference to the parent post of this comment.
      * @param id  id of comment
      * @param author Account details/ passed account object
      * @param message comment string
@@ -24,31 +31,33 @@ public class CommentPost extends Post {
     }
 
     /**
-     *getter method for comments
-     * @return arraylist of comments
+     * Getter method for comments list.
+     * @return ArrayList of comments
      */
     public ArrayList<CommentPost> getComments() {
         return comments;
     }
 
     /**
-     *getter method for endorsements
-     * @return arraylist of endorsements
+     * Getter method for endorsements list.
+     * @return ArrayList of endorsements
      */
     public ArrayList<EndorsementPost> getEndorsements() {
         return endorsements;
     }
 
     /**
-     * This method is used to add comments to the comments arraylist in CommentPost
-     * @param commentPost  for passing the commentPost object
+     * This method is used to add comments to the comments ArrayList in this
+     * CommentPost.
+     * @param commentPost for passing the commentPost object
      */
     public void addComment(CommentPost commentPost) {
         comments.add(commentPost);
     }
 
     /**
-     *This method is used to remove comments from the comments arraylist in CommentPost
+     * This method is used to remove comments from the comments ArrayList in
+     * this CommentPost.
      * @param commentPost passes the commentPost object
      */
     public void removeComment(CommentPost commentPost) {
@@ -56,7 +65,8 @@ public class CommentPost extends Post {
     }
 
     /**
-     *This method is used to add endorsements  to the endorsement arraylist in CommentPost
+     * This method is used to add endorsements to the endorsement ArrayList in
+     * this CommentPost.
      * @param endorsementPost passes the EndorsementPost object
      */
     public void addEndorsement(EndorsementPost endorsementPost) {
@@ -64,7 +74,8 @@ public class CommentPost extends Post {
     }
 
     /**
-     *This method is used to remove endorsements to the endorsement arraylist in CommentPost
+     * This method is used to remove endorsements from the endorsement ArrayList
+     * in this CommentPost.
      * @param endorsementPost passes the EndorsementPost object
      */
     public void removeEndorsement(EndorsementPost endorsementPost) {
@@ -72,7 +83,7 @@ public class CommentPost extends Post {
     }
 
     /**
-     *This setter method is used to update post
+     * This setter method is used to update post.
      * @param post passes the post object
      */
     public void setPost(Post post) {
@@ -80,13 +91,18 @@ public class CommentPost extends Post {
     }
 
     /**
-     * This  getter method gets the post
+     * This getter method gets the post.
      * @return gets the post
      */
     public Post getPost() {
         return post;
     }
 
+    /**
+     * toString override method which provides more detail about the comment
+     * post object.
+     * @return comment post information string
+     */
     @Override
     public String toString() {
         return "ID: " + id + "\nAccount: " + author.getHandle()
