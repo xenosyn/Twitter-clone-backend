@@ -503,7 +503,7 @@ public class SocialMedia implements SocialMediaPlatform {
         checkPostIsActionable(post);
 
         StringBuilder init = new StringBuilder();
-        appendChildrenRecursively(post,init,0);
+        appendChildrenRecursively(post,init,0,false);
         return init;
     }
 
@@ -518,36 +518,55 @@ public class SocialMedia implements SocialMediaPlatform {
      *              and comments on comments recursively
      */
     public void appendChildrenRecursively(Post post, StringBuilder sb,
-                                          int depth) {
+                                          int depth, boolean firstComment) {
         if (post instanceof OriginalPost) {
             OriginalPost originalPost = (OriginalPost) post;
             ArrayList<CommentPost> comments = originalPost.getComments();
 
             // Append current post string
-            sb.append(post.toString() + "\n|\n| > ");
+            sb.append(post);
 
+            boolean first = true;
             for (CommentPost o : comments) {
-                appendChildrenRecursively(o,sb,depth + 1);
+                appendChildrenRecursively(o,sb,depth + 1, first);
+                first = false;
             }
 
         } else if (post instanceof CommentPost) {
+            // Get indent
+            String indent = " ".repeat(depth*4);
+            String firstIndent = " ".repeat((depth*4) - 4);
+
+            if (sb.charAt(sb.length() - 1) == '\n') {
+                sb.append(indent);
+            }
+
             CommentPost commentPost = (CommentPost) post;
             ArrayList<CommentPost> comments = commentPost.getComments();
 
             // Append current post string
-            String currentInfo = post.toString() + "\n|\n| > ";
-            // Get indent
-            String indent = " ".repeat(depth*4);
+            String currentInfo = post.toString();
 
             // Create Regex Pattern
             Pattern pattern = Pattern.compile("\n");
             // Get matcher object from pattern
             Matcher matcher = pattern.matcher(currentInfo);
             // Replace newline with indented newline
-            sb.append(matcher.replaceAll("\n" + indent));
+            currentInfo = matcher.replaceAll("\n" + indent);
 
+            if (firstComment) {
+                currentInfo = "\n" + firstIndent + "|\n"
+                        + firstIndent + "| > " + currentInfo;
+            } else {
+                currentInfo = "\n\n" + firstIndent + "| > " + currentInfo;
+            }
+
+            sb.append(currentInfo);
+
+            boolean first = true;
             for (CommentPost c : comments) {
-                appendChildrenRecursively(c,sb,depth+1);
+                appendChildrenRecursively(c,sb,depth+1,first);
+                first = false;
             }
         }
     }

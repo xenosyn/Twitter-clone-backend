@@ -81,8 +81,10 @@ public class OriginalPost extends Post {
      */
     @Override
     public String toString() {
-        return "ID: " + id + "\nAccount: " + author.getHandle()
+        return "ID: " + super.getId() + "\nAccount: "
+                + super.getAuthor().getHandle()
                 + "\nNo. endorsements: " + endorsements.size()
-                + " | No. comments: " + comments.size() + "\n" + message;
+                + " | No. comments: " + comments.size() + "\n"
+                + super.getMessage();
     }
 }

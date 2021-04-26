@@ -10,9 +10,9 @@ import java.io.Serializable;
  */
 public abstract class Post implements Serializable {
     // TODO - make private and use getters and setters
-    int id;
-    Account author;
-    String message;
+    private int id;
+    private Account author;
+    private String message;
 
     /**
      * Aids in instantiating a child of this class by assigning values for id,
